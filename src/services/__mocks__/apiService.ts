@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-
 import { SearchResult } from '../../types';
 
 const mockSearchPokemon = vi.fn(
