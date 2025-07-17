@@ -27,7 +27,9 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "*.ts"]
+  "include": ["src", "*.ts", "vite.config.ts", "src/setupTests.ts"]
 }
