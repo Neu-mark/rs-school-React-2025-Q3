@@ -1,6 +1,5 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
-
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -21,6 +20,10 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/vite-env.d.ts',
         'src/types.ts',
+
+        'src/services/apiService.ts',
+        'src/utils/storage.ts',
+        'src/**/__mocks__/**',
       ],
       thresholds: {
         global: {
