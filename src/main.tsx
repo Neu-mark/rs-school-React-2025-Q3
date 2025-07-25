@@ -5,8 +5,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './Root';
 import AboutPage from './pages/AboutPage';
 import ErrorPage from './pages/ErrorPage';
-
-const HomePage = () => <div>This will be the main page</div>;
+import HomePage from './pages/HomePage';
+import { apiService } from './services/apiService';
+import { getSearchTerm, saveSearchTerm } from './utils/storage';
 
 import './index.css';
 
@@ -18,6 +19,17 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        loader: async ({ request }) => {
+          const url = new URL(request.url);
+          let searchTerm = url.searchParams.get('q');
+          if (searchTerm === null) {
+            searchTerm = getSearchTerm();
+          }
+          saveSearchTerm(searchTerm);
+          const results = await apiService.searchPokemon(searchTerm);
+
+          return { results, searchTerm };
+        },
         element: <HomePage />,
       },
       {
@@ -25,10 +37,6 @@ const router = createBrowserRouter([
         element: <AboutPage />,
       },
     ],
-  },
-  {
-    path: '*',
-    element: <ErrorPage />,
   },
 ]);
 
