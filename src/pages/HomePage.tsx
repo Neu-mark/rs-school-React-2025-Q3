@@ -5,20 +5,22 @@ import {
   Outlet,
   useOutlet,
 } from 'react-router-dom';
-import type { SearchResult } from '../types';
+import type { PaginatedSearchResult } from '../services/apiService';
 
 import Search from '../components/Search';
 import Results from '../components/Results';
 import SearchInitializer from '../components/SearchInitializer';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import Pagination from '../components/Pagination';
 
-interface HomeLoaderData {
-  results: SearchResult[];
+interface HomeLoaderData extends PaginatedSearchResult {
   searchTerm: string;
+  currentPage: number;
 }
 
 export default function HomePage() {
-  const { results, searchTerm } = useLoaderData() as HomeLoaderData;
+  const { results, searchTerm, totalCount, currentPage } =
+    useLoaderData() as HomeLoaderData;
 
   const navigation = useNavigation();
   const isSearchLoading =
@@ -40,8 +42,11 @@ export default function HomePage() {
             <Search initialValue={searchTerm} />
           </div>
         </section>
+
         <section className="mb-8">
           <Results results={results} loading={isSearchLoading} error={null} />
+          {}
+          <Pagination totalCount={totalCount} currentPage={currentPage} />
         </section>
       </div>
 

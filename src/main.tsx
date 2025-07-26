@@ -22,8 +22,15 @@ const router = createBrowserRouter([
         loader: async ({ request }) => {
           const url = new URL(request.url);
           const searchTerm = url.searchParams.get('q') || '';
-          const results = await apiService.searchPokemon(searchTerm);
-          return { results, searchTerm };
+
+          const page = parseInt(url.searchParams.get('page') || '1', 10);
+
+          const { results, totalCount } = await apiService.searchPokemon(
+            searchTerm,
+            page
+          );
+
+          return { results, searchTerm, totalCount, currentPage: page };
         },
         element: <HomePage />,
         children: [
