@@ -6,6 +6,7 @@ import Root from './Root';
 import AboutPage from './pages/AboutPage';
 import ErrorPage from './pages/ErrorPage';
 import HomePage from './pages/HomePage';
+import DetailPage from './pages/DetailPage';
 import { apiService } from './services/apiService';
 
 import './index.css';
@@ -17,16 +18,27 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        index: true,
+        path: '/',
         loader: async ({ request }) => {
           const url = new URL(request.url);
           const searchTerm = url.searchParams.get('q') || '';
-
           const results = await apiService.searchPokemon(searchTerm);
-
           return { results, searchTerm };
         },
         element: <HomePage />,
+        children: [
+          {
+            path: 'pokemon/:pokemonId',
+            loader: async ({ params }) => {
+              const { pokemonId } = params;
+              if (!pokemonId) {
+                throw new Response('Not Found', { status: 404 });
+              }
+              return apiService.getPokemonDetails(pokemonId);
+            },
+            element: <DetailPage />,
+          },
+        ],
       },
       {
         path: 'about',

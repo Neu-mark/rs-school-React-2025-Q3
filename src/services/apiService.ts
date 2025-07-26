@@ -11,11 +11,9 @@ class ApiService {
   private async fetchWithErrorHandling<T>(url: string): Promise<T> {
     try {
       const response = await fetch(url);
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       return await response.json();
     } catch (error) {
       if (error instanceof Error) {
@@ -32,7 +30,6 @@ class ApiService {
       const englishEntry = species.flavor_text_entries.find(
         (entry) => entry.language.name === 'en'
       );
-
       return (
         englishEntry?.flavor_text.replace(/\f/g, ' ') ||
         'No description available'
@@ -44,12 +41,25 @@ class ApiService {
 
   async searchPokemon(searchTerm: string): Promise<SearchResult[]> {
     const trimmed = searchTerm.trim().toLowerCase();
-
     if (trimmed) {
       return this.fetchSinglePokemon(trimmed);
     }
-
     return this.fetchPokemonList();
+  }
+  public async getPokemonDetails(
+    pokemonId: string | number
+  ): Promise<PokemonDetail> {
+    const pokemon = await this.fetchWithErrorHandling<PokemonDetail>(
+      `${this.baseUrl}/pokemon/${String(pokemonId).toLowerCase()}`
+    );
+    return {
+      ...pokemon,
+      name: this.capitalize(pokemon.name),
+      species: {
+        ...pokemon.species,
+        url: pokemon.species.url,
+      },
+    };
   }
 
   private async fetchSinglePokemon(name: string): Promise<SearchResult[]> {
@@ -57,9 +67,7 @@ class ApiService {
       const pokemon = await this.fetchWithErrorHandling<PokemonDetail>(
         `${this.baseUrl}/pokemon/${name}`
       );
-
       const description = await this.getPokemonDescription(pokemon.species.url);
-
       return [
         {
           id: pokemon.id,
@@ -72,7 +80,6 @@ class ApiService {
       if (error instanceof Error && error.message.includes('404')) {
         throw new Error(`Pokemon "${name}" not found`);
       }
-
       throw error;
     }
   }
@@ -81,7 +88,6 @@ class ApiService {
     const response = await this.fetchWithErrorHandling<PokemonApiResponse>(
       `${this.baseUrl}/pokemon?limit=20`
     );
-
     const pokemonPromises = response.results.map(async (entry) => {
       try {
         const detail = await this.fetchWithErrorHandling<PokemonDetail>(
@@ -90,7 +96,6 @@ class ApiService {
         const description = await this.getPokemonDescription(
           detail.species.url
         );
-
         return {
           id: detail.id,
           name: this.capitalize(detail.name),
@@ -106,7 +111,6 @@ class ApiService {
         };
       }
     });
-
     return Promise.all(pokemonPromises);
   }
 
