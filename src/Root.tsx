@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 
 export default function Root() {
@@ -12,7 +12,8 @@ export default function Root() {
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <header className="text-center mb-8">
             <h1 className="text-4xl font-bold text-pokemon-primary mb-2">
-              🔍 Pokémon Search
+              {}
+              <Link to="/">🔍 Pokémon Search</Link>
             </h1>
             <p className="text-gray-600">
               Discover and explore Pokémon with detailed information
@@ -23,6 +24,10 @@ export default function Root() {
           </main>
 
           <footer className="text-center mt-12 pt-8 border-t border-gray-200">
+            {}
+            <Link to="/about" className="btn-secondary text-sm mr-4">
+              About
+            </Link>
             <button
               onClick={throwTestError}
               className="btn-secondary text-sm"
