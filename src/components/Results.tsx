@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom';
-
 import { SearchResult } from '../types';
 import Loader from './Loader';
 
@@ -15,15 +14,34 @@ export default function Results({ results, loading, error }: ResultsProps) {
   if (loading) {
     return <Loader />;
   }
-
   if (error) {
-    return <div className="card max-w-2xl mx-auto">{}</div>;
+    return (
+      <div className="card max-w-2xl mx-auto">
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4">😞</div>
+          <h3 className="text-xl font-semibold text-pokemon-error mb-2">
+            Oops! Something went wrong
+          </h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
   }
-
   if (results.length === 0) {
-    return <div className="card max-w-2xl mx-auto">{}</div>;
+    return (
+      <div className="card max-w-2xl mx-auto">
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            No Pokémon found
+          </h3>
+          <p className="text-gray-600">
+            Try searching for a different Pokémon.
+          </p>
+        </div>
+      </div>
+    );
   }
-
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
@@ -55,7 +73,6 @@ export default function Results({ results, loading, error }: ResultsProps) {
                   />
                 </div>
               )}
-
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-pokemon-primary mb-2 text-center">
                   {pokemon.name}
@@ -69,7 +86,6 @@ export default function Results({ results, loading, error }: ResultsProps) {
                   </p>
                 </div>
               </div>
-
               <div className="mt-4 flex justify-center">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pokemon-primary text-white">
                   #{pokemon.id}

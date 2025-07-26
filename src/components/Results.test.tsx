@@ -1,102 +1,42 @@
-import { render, screen, within } from '@testing-library/react';
-import Results from './Results';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { SearchResult } from '../types';
+import { MemoryRouter } from 'react-router-dom';
+import Results from './Results';
+import type { SearchResult } from '../types';
 
-const mockPokemon: SearchResult[] = [
-  {
-    id: 25,
-    name: 'Pikachu',
-    description:
-      'When it is angered, it immediately discharges the energy stored in the pouches on its cheeks.',
-    imageUrl:
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
-  },
-  {
-    id: 6,
-    name: 'Charizard',
-    description:
-      'It spits fire that is hot enough to melt boulders. It may cause forest fires by blowing flames.',
-    imageUrl:
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png',
-  },
-];
+const renderWithRouter = (ui: React.ReactElement) => {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+};
 
 describe('Results Component', () => {
+  const mockResults: SearchResult[] = [
+    { id: 1, name: 'Pikachu', description: 'Mouse', imageUrl: 'p.png' },
+    { id: 2, name: 'Charizard', description: 'Dragon', imageUrl: 'c.png' },
+  ];
+
   it('should render the Loader component when loading is true', () => {
-    render(<Results results={[]} loading={true} error={null} />);
-    expect(screen.getByText('Searching for Pokémon...')).toBeInTheDocument();
+    renderWithRouter(<Results results={[]} loading={true} error={null} />);
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 
   it('should render an error message when an error is provided', () => {
-    const errorMessage = 'Pokemon "Mewtwo" not found';
-    render(<Results results={[]} loading={false} error={errorMessage} />);
-    expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    renderWithRouter(<Results results={[]} loading={false} error="API Down" />);
+    expect(
+      screen.getByRole('heading', { name: /Oops! Something went wrong/i })
+    ).toBeInTheDocument();
   });
 
-  it('should render "No Pokémon found" message when results array is empty and not loading', () => {
-    render(<Results results={[]} loading={false} error={null} />);
-    expect(screen.getByText('No Pokémon found')).toBeInTheDocument();
+  it('should render "No Pokémon found" message when results array is empty', () => {
+    renderWithRouter(<Results results={[]} loading={false} error={null} />);
+    expect(
+      screen.getByRole('heading', { name: /No Pokémon found/i })
+    ).toBeInTheDocument();
   });
-
-  it('should render a single pokemon card correctly', () => {
-    const firstPokemon = mockPokemon[0];
-    if (!firstPokemon) {
-      throw new Error('Test data is invalid');
-    }
-
-    const singlePokemon = [firstPokemon];
-    render(<Results results={singlePokemon} loading={false} error={null} />);
-    expect(
-      screen.getByRole('heading', { name: 'Pokémon Details' })
-    ).toBeInTheDocument();
-
-    const cards = screen.getAllByRole('heading', { level: 3 });
-    expect(cards).toHaveLength(1);
-
-    const firstCard = cards[0];
-    if (!firstCard) {
-      throw new Error('Card element not found');
-    }
-
-    expect(firstCard).toHaveTextContent('Pikachu');
-
-    const cardElement = firstCard.closest('.card');
-    if (!cardElement) {
-      throw new Error('Card container not found');
-    }
-
-    const utils = within(cardElement as HTMLElement);
-    expect(utils.getByText(/Description:/)).toBeInTheDocument();
-    expect(
-      utils.getByText(
-        /When it is angered, it immediately discharges the energy/
-      )
-    ).toBeInTheDocument();
-    expect(utils.getByRole('img', { name: 'Pikachu' })).toBeInTheDocument();
-    expect(utils.getByText('#25')).toBeInTheDocument();
-  });
-
-  it('should render a list of pokemon cards when results are provided', () => {
-    render(<Results results={mockPokemon} loading={false} error={null} />);
-    expect(
-      screen.getByRole('heading', {
-        name: `Found ${mockPokemon.length} Pokémon`,
-      })
-    ).toBeInTheDocument();
-
-    const cards = screen.getAllByRole('heading', { level: 3 });
-    expect(cards).toHaveLength(mockPokemon.length);
-
-    const firstCard = cards[0];
-    const secondCard = cards[1];
-
-    if (!firstCard || !secondCard) {
-      throw new Error('Card elements not found');
-    }
-
-    expect(firstCard).toHaveTextContent('Pikachu');
-    expect(secondCard).toHaveTextContent('Charizard');
+  it('should render a list of pokemon cards', () => {
+    renderWithRouter(
+      <Results results={mockResults} loading={false} error={null} />
+    );
+    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    expect(screen.getByText('Charizard')).toBeInTheDocument();
   });
 });

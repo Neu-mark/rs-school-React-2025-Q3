@@ -1,33 +1,12 @@
 import { useLoaderData, useNavigation, useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
-
-export interface PokemonDetail {
-  id: number;
-  name: string;
-  sprites: {
-    front_default: string;
-    other: {
-      dream_world: {
-        front_default: string;
-      };
-    };
-  };
-  height: number;
-  weight: number;
-  types: {
-    type: {
-      name: string;
-    };
-  }[];
-}
-
+import { PokemonDetail } from '../types';
 export default function DetailPage() {
   const navigation = useNavigation();
   const navigate = useNavigate();
-
   const pokemonDetails = useLoaderData() as PokemonDetail;
-
   const isLoading = navigation.state === 'loading';
+
   const handleClose = () => {
     navigate({
       pathname: '/',
@@ -52,7 +31,6 @@ export default function DetailPage() {
       >
         ✖
       </button>
-
       <div className="text-center">
         <h2 className="text-3xl font-bold capitalize mb-4">
           {pokemonDetails.name}
@@ -60,13 +38,13 @@ export default function DetailPage() {
         <img
           src={
             pokemonDetails.sprites.other.dream_world.front_default ||
-            pokemonDetails.sprites.front_default
+            pokemonDetails.sprites.front_default ||
+            ''
           }
           alt={pokemonDetails.name}
           className="mx-auto h-40 w-40"
         />
       </div>
-
       <div className="mt-6">
         <h3 className="font-bold text-lg mb-2">Details:</h3>
         <ul className="space-y-1 text-gray-700">
