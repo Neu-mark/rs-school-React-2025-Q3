@@ -7,7 +7,6 @@ import AboutPage from './pages/AboutPage';
 import ErrorPage from './pages/ErrorPage';
 import HomePage from './pages/HomePage';
 import { apiService } from './services/apiService';
-import { getSearchTerm, saveSearchTerm } from './utils/storage';
 
 import './index.css';
 
@@ -21,11 +20,8 @@ const router = createBrowserRouter([
         index: true,
         loader: async ({ request }) => {
           const url = new URL(request.url);
-          let searchTerm = url.searchParams.get('q');
-          if (searchTerm === null) {
-            searchTerm = getSearchTerm();
-          }
-          saveSearchTerm(searchTerm);
+          const searchTerm = url.searchParams.get('q') || '';
+
           const results = await apiService.searchPokemon(searchTerm);
 
           return { results, searchTerm };
