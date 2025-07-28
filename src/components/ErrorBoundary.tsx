@@ -25,7 +25,6 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log silently or send to monitoring system (Sentry, etc.)
     this.setState({ error, errorInfo });
   }
 

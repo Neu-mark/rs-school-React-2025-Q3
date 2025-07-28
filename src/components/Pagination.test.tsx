@@ -29,10 +29,7 @@ describe('Pagination Component', () => {
     const prevLink = screen.getByRole('link', { name: /Previous/i });
     expect(prevLink).toHaveClass('pointer-events-none');
   });
-
-  // ▼▼▼ ИСПРАВЛЕННЫЙ ТЕСТ ▼▼▼
   it('should preserve existing query parameters', () => {
-    // Мы передаем ?q=pikachu в пропс, а не в MemoryRouter
     renderWithRouter(
       <Pagination totalCount={100} currentPage={2} currentSearch="?q=pikachu" />
     );

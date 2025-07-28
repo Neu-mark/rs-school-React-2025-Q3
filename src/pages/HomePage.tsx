@@ -22,9 +22,9 @@ export default function HomePage() {
   const { results, searchTerm, totalCount, currentPage } =
     useLoaderData() as HomeLoaderData;
   const navigation = useNavigation();
-  const location = useLocation(); // <-- ПОЛУЧАЕМ LOCATION
+  const location = useLocation();
   const isSearchLoading = navigation.state === 'loading';
-  const [, setStoredSearchTerm] = useLocalStorage('searchTerm', '');
+  const [, setStoredSearchTerm] = useLocalStorage('searchTerm', searchTerm);
   const outlet = useOutlet();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function HomePage() {
           <Pagination
             totalCount={totalCount}
             currentPage={currentPage}
-            currentSearch={location.search} // <-- ПЕРЕДАЕМ ПРОПС
+            currentSearch={location.search}
           />
         </section>
       </div>

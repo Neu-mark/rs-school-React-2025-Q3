@@ -5,20 +5,18 @@ const PAGE_LIMIT = 20;
 interface PaginationProps {
   totalCount: number;
   currentPage: number;
-  currentSearch: string; // <-- НОВЫЙ ПРОПС
+  currentSearch: string;
 }
-
 export default function Pagination({
   totalCount,
   currentPage,
-  currentSearch, // <-- ИСПОЛЬЗУЕМ ПРОПС
+  currentSearch,
 }: PaginationProps) {
   const totalPages = Math.ceil(totalCount / PAGE_LIMIT);
 
   if (totalPages <= 1) return null;
 
   const createPageUrl = (pageNumber: number) => {
-    // Используем переданный search, а не useLocation
     const searchParams = new URLSearchParams(currentSearch);
     searchParams.set('page', String(pageNumber));
     return `?${searchParams.toString()}`;
