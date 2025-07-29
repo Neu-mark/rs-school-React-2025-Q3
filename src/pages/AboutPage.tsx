@@ -10,7 +10,7 @@ export default function AboutPage() {
       </p>
       <div className="mt-6">
         <a
-          href="https://rs.school/react/"
+          href="https://rs.school/courses/reactjs"
           target="_blank"
           rel="noopener noreferrer"
           className="btn-primary"
