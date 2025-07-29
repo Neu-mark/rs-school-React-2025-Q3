@@ -4,18 +4,20 @@ import {
   PokemonDetail,
   PokemonSpecies,
 } from '../types';
+const PAGE_LIMIT = 20;
+export interface PaginatedSearchResult {
+  results: SearchResult[];
+  totalCount: number;
+}
 
 class ApiService {
   private readonly baseUrl = 'https://pokeapi.co/api/v2';
-
   private async fetchWithErrorHandling<T>(url: string): Promise<T> {
     try {
       const response = await fetch(url);
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       return await response.json();
     } catch (error) {
       if (error instanceof Error) {
@@ -24,7 +26,6 @@ class ApiService {
       throw new Error('An unexpected error occurred');
     }
   }
-
   private async getPokemonDescription(speciesUrl: string): Promise<string> {
     try {
       const species =
@@ -32,7 +33,6 @@ class ApiService {
       const englishEntry = species.flavor_text_entries.find(
         (entry) => entry.language.name === 'en'
       );
-
       return (
         englishEntry?.flavor_text.replace(/\f/g, ' ') ||
         'No description available'
@@ -41,25 +41,34 @@ class ApiService {
       return 'No description available';
     }
   }
-
-  async searchPokemon(searchTerm: string): Promise<SearchResult[]> {
+  async searchPokemon(
+    searchTerm: string,
+    page = 1
+  ): Promise<PaginatedSearchResult> {
     const trimmed = searchTerm.trim().toLowerCase();
-
     if (trimmed) {
-      return this.fetchSinglePokemon(trimmed);
+      const results = await this.fetchSinglePokemon(trimmed);
+      return { results, totalCount: results.length };
     }
-
-    return this.fetchPokemonList();
+    return this.fetchPokemonList(page);
   }
-
+  public async getPokemonDetails(
+    pokemonId: string | number
+  ): Promise<PokemonDetail> {
+    const pokemon = await this.fetchWithErrorHandling<PokemonDetail>(
+      `${this.baseUrl}/pokemon/${String(pokemonId).toLowerCase()}`
+    );
+    return {
+      ...pokemon,
+      name: this.capitalize(pokemon.name),
+    };
+  }
   private async fetchSinglePokemon(name: string): Promise<SearchResult[]> {
     try {
       const pokemon = await this.fetchWithErrorHandling<PokemonDetail>(
         `${this.baseUrl}/pokemon/${name}`
       );
-
       const description = await this.getPokemonDescription(pokemon.species.url);
-
       return [
         {
           id: pokemon.id,
@@ -70,17 +79,16 @@ class ApiService {
       ];
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
-        throw new Error(`Pokemon "${name}" not found`);
+        return [];
       }
-
       throw error;
     }
   }
+  private async fetchPokemonList(page: number): Promise<PaginatedSearchResult> {
+    const offset = (page - 1) * PAGE_LIMIT;
+    const url = `${this.baseUrl}/pokemon?limit=${PAGE_LIMIT}&offset=${offset}`;
 
-  private async fetchPokemonList(): Promise<SearchResult[]> {
-    const response = await this.fetchWithErrorHandling<PokemonApiResponse>(
-      `${this.baseUrl}/pokemon?limit=20`
-    );
+    const response = await this.fetchWithErrorHandling<PokemonApiResponse>(url);
 
     const pokemonPromises = response.results.map(async (entry) => {
       try {
@@ -90,7 +98,6 @@ class ApiService {
         const description = await this.getPokemonDescription(
           detail.species.url
         );
-
         return {
           id: detail.id,
           name: this.capitalize(detail.name),
@@ -107,9 +114,9 @@ class ApiService {
       }
     });
 
-    return Promise.all(pokemonPromises);
+    const results = await Promise.all(pokemonPromises);
+    return { results, totalCount: response.count };
   }
-
   private capitalize(text: string): string {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }

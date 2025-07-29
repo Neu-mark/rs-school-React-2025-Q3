@@ -21,7 +21,6 @@ export default defineConfig({
         'src/vite-env.d.ts',
         'src/types.ts',
         'src/services/apiService.ts',
-        'src/utils/storage.ts',
         'src/**/__mocks__/**',
       ],
       thresholds: {

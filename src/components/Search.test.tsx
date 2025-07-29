@@ -1,74 +1,36 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { describe, it, expect } from 'vitest';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import Search from './Search';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getSearchTerm } from '../utils/storage';
+import React from 'react';
 
-const mockedGetSearchTerm = vi.mocked(getSearchTerm);
+describe('Refactored Search Component', () => {
+  const renderWithDataRouter = (ui: React.ReactElement) => {
+    const routes = [{ path: '/', element: ui }];
+    const router = createMemoryRouter(routes);
+    return render(<RouterProvider router={router} />);
+  };
 
-describe('Search Component', () => {
-  let onSearchMock: ReturnType<typeof vi.fn>;
-
-  beforeEach(() => {
-    onSearchMock = vi.fn();
-    vi.clearAllMocks();
-  });
-
-  it('should render with an initial value from props', () => {
+  it('should render with the initial value provided', () => {
     const initialValue = 'charizard';
-    render(<Search onSearch={onSearchMock} initialValue={initialValue} />);
+    renderWithDataRouter(<Search initialValue={initialValue} />);
+
     const input = screen.getByPlaceholderText(
-      'Enter Pokémon name (e.g., pikachu, charizard)...'
-    );
-    expect(input).toHaveValue(initialValue);
+      /Enter Pokémon name/i
+    ) as HTMLInputElement;
+    expect(input.value).toBe(initialValue);
   });
 
-  it('should display initialValue even if getSearchTerm returns something else', () => {
-    mockedGetSearchTerm.mockReturnValue('squirtle');
-    const initialValueFromProps = 'bulbasaur';
-    render(
-      <Search onSearch={onSearchMock} initialValue={initialValueFromProps} />
-    );
+  it('should have an input field with the correct "name" attribute', () => {
+    renderWithDataRouter(<Search initialValue="" />);
     const input = screen.getByRole('textbox');
-    expect(input).toHaveValue(initialValueFromProps);
-    expect(mockedGetSearchTerm).not.toHaveBeenCalled();
+    expect(input).toHaveAttribute('name', 'q');
   });
 
-  it('should update input value when user types', async () => {
-    const user = userEvent.setup();
-    render(<Search onSearch={onSearchMock} initialValue="" />);
-    const input = screen.getByRole('textbox');
-    await user.type(input, 'mewtwo');
-    expect(input).toHaveValue('mewtwo');
-  });
+  it('should render a submit button', () => {
+    renderWithDataRouter(<Search initialValue="" />);
 
-  it('should call onSearch with the same term when the search button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<Search onSearch={onSearchMock} initialValue="  pikachu  " />);
-    const searchButton = screen.getByRole('button', { name: /Search/i });
-    await user.click(searchButton);
-    expect(onSearchMock).toHaveBeenCalledOnce();
-    // Без trim, ожидаем вызов с пробелами, как есть
-    expect(onSearchMock).toHaveBeenCalledWith('  pikachu  ');
-  });
-
-  it('should call onSearch when form is submitted via Enter key', async () => {
-    const user = userEvent.setup();
-    const searchTerm = 'snorlax';
-    render(<Search onSearch={onSearchMock} initialValue={searchTerm} />);
-    const input = screen.getByRole('textbox');
-    await user.type(input, '{enter}');
-    expect(onSearchMock).toHaveBeenCalledOnce();
-    expect(onSearchMock).toHaveBeenCalledWith(searchTerm);
-  });
-
-  it('should disable input and button when disabled prop is true', () => {
-    render(<Search onSearch={onSearchMock} initialValue="" disabled={true} />);
-    const input = screen.getByRole('textbox');
-    const button = screen.getByRole('button', { name: /Searching/i });
-
-    expect(input).toBeDisabled();
-    expect(button).toBeDisabled();
-    expect(screen.getByText('Searching...')).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /Search/i });
+    expect(button).toBeInTheDocument();
   });
 });
