@@ -8,6 +8,7 @@ import ErrorPage from './pages/ErrorPage';
 import HomePage from './pages/HomePage';
 import DetailPage from './pages/DetailPage';
 import { apiService } from './services/apiService';
+import { ThemeProvider } from './context/ThemeContext';
 
 import './index.css';
 
@@ -63,6 +64,8 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </StrictMode>
 );
