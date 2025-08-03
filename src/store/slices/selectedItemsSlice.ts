@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
+import type { SearchResult } from '../../types';
 
-interface PokemonItem {
-  id: string;
-  name: string;
-}
 interface SelectedItemsState {
-  items: PokemonItem[];
+  items: SearchResult[];
 }
+
 const initialState: SelectedItemsState = {
   items: [],
 };
@@ -16,7 +14,7 @@ const selectedItemsSlice = createSlice({
   name: 'selectedItems',
   initialState,
   reducers: {
-    addItem: (state, action: PayloadAction<PokemonItem>) => {
+    addItem: (state, action: PayloadAction<SearchResult>) => {
       const isAlreadyAdded = state.items.some(
         (item) => item.id === action.payload.id
       );
@@ -24,7 +22,7 @@ const selectedItemsSlice = createSlice({
         state.items.push(action.payload);
       }
     },
-    removeItem: (state, action: PayloadAction<string>) => {
+    removeItem: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
     },
     clearSelectedItems: (state) => {
@@ -32,10 +30,13 @@ const selectedItemsSlice = createSlice({
     },
   },
 });
+
 export const { addItem, removeItem, clearSelectedItems } =
   selectedItemsSlice.actions;
+
 export const selectSelectedItems = (state: RootState) =>
   state.selectedItems.items;
 export const selectSelectedItemsCount = (state: RootState) =>
   state.selectedItems.items.length;
+
 export default selectedItemsSlice.reducer;
