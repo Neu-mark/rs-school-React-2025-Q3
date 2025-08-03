@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
+
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -9,6 +11,7 @@ export default {
           secondary: '#1E40AF',
           accent: '#F59E0B',
           success: '#10B981',
+
           error: '#EF4444',
           warning: '#F59E0B',
         },

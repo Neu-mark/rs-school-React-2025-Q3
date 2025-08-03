@@ -1,13 +1,16 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Provider } from 'react-redux';
 
+import { store } from './store/store';
 import Root from './Root';
 import AboutPage from './pages/AboutPage';
 import ErrorPage from './pages/ErrorPage';
 import HomePage from './pages/HomePage';
 import DetailPage from './pages/DetailPage';
 import { apiService } from './services/apiService';
+import { ThemeProvider } from './context/ThemeContext';
 
 import './index.css';
 
@@ -22,14 +25,11 @@ const router = createBrowserRouter([
         loader: async ({ request }) => {
           const url = new URL(request.url);
           const searchTerm = url.searchParams.get('q') || '';
-
           const page = parseInt(url.searchParams.get('page') || '1', 10);
-
           const { results, totalCount } = await apiService.searchPokemon(
             searchTerm,
             page
           );
-
           return { results, searchTerm, totalCount, currentPage: page };
         },
         element: <HomePage />,
@@ -63,6 +63,10 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </Provider>
   </StrictMode>
 );
