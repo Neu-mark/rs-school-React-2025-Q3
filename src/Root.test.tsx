@@ -1,18 +1,13 @@
-import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, renderWithProviders } from './utils/test-utils';
 import Root from './Root';
 
 describe('Root component', () => {
   it('should render header and footer', () => {
-    render(
-      <MemoryRouter>
-        <Root />
-      </MemoryRouter>
-    );
+    renderWithProviders(<Root />);
     expect(
-      screen.getByRole('heading', { name: /Pokémon Search/i })
+      screen.getByRole('heading', { name: /pokémon search/i })
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /About/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
   });
 });
